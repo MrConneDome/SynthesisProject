@@ -1,0 +1,21 @@
+{
+    "pipeline":
+    [
+        {
+                "type":"readers.las",
+                "filename":"MLS_pmf_and_bag_filtered_subset.las"
+        },
+        {
+                "type":"filters.python",
+				"add_dimension":"bag_id",
+                "module":"anything",
+                "function":"bag_id",
+                "script":"bag_link.py"				
+        },
+		{
+				"type":"writers.las",
+				"filename":"bag_test2.las",
+				"extra_dims":"all"
+		}
+    ]
+}
