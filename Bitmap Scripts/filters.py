@@ -15,6 +15,7 @@ def applygaussian(fn, sigma):
     print(raster)
     raster_after = gaussian_filter(raster, sigma)
     print(raster_after)
+    
     return raster_after
 
 def applymedian(fn,kernel_size):
