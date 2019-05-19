@@ -39,7 +39,7 @@ def detectrectange(fn,size_factor_min,size_factor_max):
         if w*h<size_factor_max*height*width and w*h>size_factor_min*height*width:
             #Plotting the results
             image = cv2.rectangle(img,(x,y),(x+w,y+h),(110,0,50),2)
-            cv2.putText(image, 'R:'+str(ratio), (cX, cY), cv2.FONT_HERSHEY_SIMPLEX, 0.3, (0, 120, 255), 1)
+            cv2.putText(image, 'R:'+str(ratio), (cX, cY), 2,0.5, (0, 120, 255), 1)
             cv2.imshow('Windows Detection',image)
         else:
             print('too big or too small')
