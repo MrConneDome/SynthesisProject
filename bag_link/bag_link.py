@@ -1,6 +1,6 @@
-import numpy as np, xml.etree.ElementTree as ET, fiona
+import numpy as np, xml.etree.ElementTree as ET, fiona, scipy.spatial
 from owslib.wfs import WebFeatureService
-from shapely.geometry import Polygon, mapping, shape
+from shapely.geometry import Polygon, mapping, Point, LineString
 from fiona.crs import from_epsg
 
 def retrieve_bag():
@@ -14,7 +14,7 @@ def retrieve_bag():
     
     
     bag_polygons = []
-    bag_polygons_buffered = []
+    eroded_polygons = []
     bag_ids = []
     
     # find all BAG panden
@@ -37,13 +37,13 @@ def retrieve_bag():
         # in this case, the feature's geometry only has an exterior boundary
         if len(bag_polygon) == 1:   
             bag_polygons.append(Polygon(bag_polygon[0]))
-            bag_polygons_buffered.append(Polygon(bag_polygon[0]).buffer(1, cap_style=3, join_style=2))
+            eroded_polygons.append(Polygon(bag_polygon[0]).buffer(-0.001, cap_style=3, join_style=2))
+            
         # in this case, multiple geometries have been found for the feature, which means it has interior boundaries as well
         elif len(bag_polygon) > 1:
             bag_polygons.append(Polygon(bag_polygon[0], bag_polygon[1:]))
-            bag_polygons_buffered.append(Polygon(bag_polygon[0], bag_polygon[1:]).buffer(1, cap_style=3, join_style=2))
-            
-    
+            eroded_polygons.append(Polygon(bag_polygon[0], bag_polygon[1:]).buffer(-0.001, cap_style=3, join_style=2))
+
     # create shapefiles, both for original BAG and buffered BAG
     shp_schema = {
         'geometry': 'Polygon',
@@ -56,12 +56,99 @@ def retrieve_bag():
                     "geometry":mapping(bag_polygons[i]),
                     "properties": {"bag_id":bag_ids[i]}
                     })
+    
+    return eroded_polygons, bag_ids
+
+
+def bag_id(ins,outs):
+    points = np.stack((ins['X'], ins['Y']), axis=-1)
+    
+    polygons, ids = retrieve_bag()
         
-    with fiona.open("bag_buffered_subset.shp", "w", crs=from_epsg(28992), driver="ESRI Shapefile", schema=shp_schema) as bag_shp:
-        for i in range(len(bag_polygons)):
+    polygon_points = []
+    polygon_points_ids = []
+    polygon_lines_set = []
+    
+    # first, retrieve all the lines from the polygons
+    for i, polygon in enumerate(polygons):
+        x, y = polygon.exterior.coords.xy
+        polygon_lines = []
+        
+        for c in range(len(x) - 1):
+            polygon_lines.append(LineString((Point(x[c], y[c]), Point(x[c+1], y[c+1]))))    # create line with current and next point
+            polygon_lines_set.append(LineString((Point(x[c], y[c]), Point(x[c+1], y[c+1]))))
+        
+        # then, create points on the lines
+        for l in polygon_lines:
+            line_length = l.length
+            for j, distance in enumerate(range(10)):
+                point = l.interpolate((line_length / 10) * distance )
+                polygon_points.append((point.x, point.y))
+                polygon_points_ids.append(ids[i])
+
+    shapely_test_points = []
+    for point in polygon_points:
+        shapely_test_points.append(Point(point[0], point[1]))
+        
+    
+    # create line and created points shapefiles for testing purposes
+    shp_schema = {
+        'geometry': 'LineString',
+        'properties': {'bag_id': 'int'},
+    }
+                     
+    with fiona.open("bag_lines.shp", "w", crs=from_epsg(28992), driver="ESRI Shapefile", schema=shp_schema) as bag_shp:
+        for i in range(len(polygon_lines_set)):
             bag_shp.write({
-                    "geometry":mapping(bag_polygons_buffered[i]),
-                    "properties": {"bag_id":bag_ids[i]}
+                    "geometry":mapping(polygon_lines_set[i]),
+                    "properties": {"bag_id":1}
+                    })
+        
+    shp_schema = {
+    'geometry': 'Point',
+    'properties': {'bag_id': 'int'},
+    }
+                     
+    with fiona.open("bag_line_points.shp", "w", crs=from_epsg(28992), driver="ESRI Shapefile", schema=shp_schema) as bag_shp:
+        for i in range(len(polygon_points)):
+            bag_shp.write({
+                    "geometry":mapping(shapely_test_points[i]),
+                    "properties": {"bag_id":polygon_points_ids[i]}
                     })
     
-    return bag_polygons
+    # create kd-tree
+    kdtree = scipy.spatial.cKDTree(polygon_points)   
+    neigh_dist, neigh_i = kdtree.query(points, k=1)
+    neigh_i = neigh_i.astype(np.uint16)     # for saving in point cloud dimension
+    
+    # we've just retrieved nearest neighbour indices, but we want the corresponding BAG-ids and put it in the .las
+    neigh_bag_id = np.empty((0, 1))
+    neigh_bag_id = np.append(neigh_bag_id, [ polygon_points_ids[i] for i in neigh_i ])
+    
+    outs['Intensity'] = neigh_i
+
+
+
+
+
+    # write points + assigned BAG id to shapefile for testing purposes
+    points = np.split(points, len(points))
+    shapely_points = []
+    for point in points:
+        shapely_points.append(Point(list(map(tuple, point))))
+    
+    shp_schema = {
+        'geometry': 'Point',
+        'properties': {'bag_id': 'int'},
+    }
+                     
+    with fiona.open("bag_classified_points.shp", "w", crs=from_epsg(28992), driver="ESRI Shapefile", schema=shp_schema) as bag_shp:
+        for i in range(len(points)):
+            bag_shp.write({
+                    "geometry":mapping(shapely_points[i]),
+                    "properties": {"bag_id":neigh_bag_id[i]}
+                    })
+      
+        
+    # PDAL requires this for a self-defined function    
+    return True
