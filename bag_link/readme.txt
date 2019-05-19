@@ -1,3 +1,5 @@
+The code is still messy and has some debugging parts in it.
+
 You have to use the pipeline JSON to run it. For this, you need to have PDAL installed (I did it with Anaconda).
 
 1. Place the files in the same folder, preferably together with the input .las.
