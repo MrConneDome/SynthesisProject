@@ -29,12 +29,13 @@ def makeasc(filename, parameter):
     text_file.write("nodata_value -9999\n")
     
     #Opening the xls file
-    workbook = xlrd.open_workbook('C:/Users/konra/Documents/GitHub/Data/bitmaptest.xls')
+    workbook = xlrd.open_workbook('C:/Users/konra/Documents/GitHub/Bitmap Example/bitmaptest.xls')
     worksheet = workbook.sheet_by_name('Arkusz1')
 
     w=x_size
     h=y_size
-    filt = filters.applygaussian('testraster.txt',2)
+    filt = filters.applygaussian('C:/Users/konra/Documents/GitHub/Bitmap Example/testraster.txt',1,120)
+    print(filt)
     for i in range(w):
         for j in range(h):
             
@@ -51,7 +52,7 @@ def makeasc(filename, parameter):
     return 
 
 #Parameters for input to function
-filename = 'raster_gaussian2.asc'
+filename = 'raster_gaussian150.asc'
 cellsize = 1
 width = 49
 height = 49
