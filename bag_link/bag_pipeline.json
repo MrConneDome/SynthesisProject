@@ -5,16 +5,29 @@
                 "type":"readers.las",
                 "filename":"MLS_pmf_and_bag_filtered_subset.las"
         },
-        {
+		{
                 "type":"filters.python",
 				"add_dimension":"bag_id",
-                "module":"anything",
+                "module":"bag_link",
                 "function":"bag_id",
                 "script":"bag_link.py"				
         },
 		{
+                "type":"filters.python",
+				"add_dimension":"bag_id",
+                "module":"anything",
+                "function":"create_bag_shp",
+                "script":"bag_link.py"				
+        },
+		{
+                "type":"filters.python",
+                "module":"anything",
+                "function":"pdal_cloud_to_shp",
+                "script":"cloud_to_shp.py"				
+        },
+		{
 				"type":"writers.las",
-				"filename":"bag_test2.las",
+				"filename":"bag_test.las",
 				"extra_dims":"all"
 		}
     ]
