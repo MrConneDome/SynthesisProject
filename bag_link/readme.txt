@@ -8,3 +8,5 @@ You have to use the pipeline JSON to run it. For this, you need to have PDAL ins
 4. Open Anaconda Prompt.
 5. cd to the directory where you've placed the files
 6. Run the following command: PDAL pipeline bag_pipeline.json
+
+Known issue: BAG-ids are appended to the .las as floats. This is due to a PDAL limitation when adding a new dimension.
