@@ -16,7 +16,6 @@ def threshold(fn,th_value):
             histogram[index[0],index[1]] = 1
         else:
             histogram[index[0],index[1]] = 0
-        #plot of the results
         
         
     return histogram
