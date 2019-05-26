@@ -34,14 +34,14 @@ def makeasc(filename, parameter):
 
     w=x_size
     h=y_size
-    filt = filters.applygaussian('C:/Users/konra/Documents/GitHub/Bitmap Example/testraster.txt',1,120)
-    print(filt)
+#    filt = filters.applygaussian('C:/Users/konra/Documents/GitHub/Bitmap Example/testraster.txt',1,120)
+#    print(filt)
     for i in range(w):
         for j in range(h):
             
-#            markers = worksheet.cell(i+1,j+1)       
-#            d = markers.value
-            d = filt[i][j]
+            markers = worksheet.cell(i+1,j+1)       
+            d = markers.value
+#            d = filt[i][j]
             #saving to asc
             if j==x_size:
                 text = str(d)+"\n"
