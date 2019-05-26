@@ -13,7 +13,7 @@ def find_if_close(cnt1,cnt2):
     for i in range(row1):
         for j in range(row2):
             dist = np.linalg.norm(cnt1[i]-cnt2[j])
-            if abs(dist) < 20 :
+            if abs(dist) < 14 :
                 return True
             elif i==row1-1 and j==row2-1:
                 return False
@@ -35,7 +35,7 @@ def averagecounter(cont_areas, group_numbers, group_number):
             
    
     
-img = cv2.imread('08rm5.jpg')
+img = cv2.imread('06rm7.jpg')
 gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 ret,thresh = cv2.threshold(gray,150,255,cv2.THRESH_BINARY) 
 contours,hier = cv2.findContours(thresh,1,2)
@@ -89,8 +89,7 @@ for i in range(maximum):
             counter1 = 1        
             for group_area in groups_area:
                 if group_area >0:
-                    if counter3==12:
-                        print(group_area,'average area vs window:',group_area,c_area,'group number',counter1,groups_h[counter1],groups_w[counter1],'window number', counter3,h,w)
+                   
                     #if area is similar to the average of existing group
 #                    print('iterating group', counter1)
                     if c_area>group_area*(1-similarity) and c_area<group_area*(1+similarity):
@@ -123,27 +122,27 @@ for i in range(maximum):
             M = cv2.moments(cont)
             cX = int((M["m10"] / M["m00"]))
             cY = int((M["m01"] / M["m00"]))
-            x,y = cX-groups_h[group_n]/2, cY-groups_w[group_n]/2
+            x,y = cX-groups_w[group_n]/2, cY-groups_h[group_n]/2
             h,w = groups_h[group_n], groups_w[group_n]
            
             print(x,y,cX,cY,h,w,groups_h[group_n]/2)
             print('...')
             counter+=1
-            ratio = round(int(w*h)/int(area),4)
+            ratio = round(int(w*h)/int(area),3)
             image = cv2.rectangle(img,(x,y),(x+w,y+h),(110,0,50),2)
-            cv2.putText(image, 'G:'+str(group_n), (cX, cY), 2,0.5, (0, 120, 255), 1)
+            cv2.putText(image, '.', (cX, cY), 2,0.5, (0, 120, 255), 1)
+            cv2.putText(image, str(ratio), (cX-h/2, cY+w/2), 2,0.5, (0, 120, 255), 1)
 cv2.imshow('Windows Detection',image)
 #        unified.append(hull)
 counter = 0
 
 for area in groups_area:
-    for areas in groups_area:  
+
         
-        if area!=0 and areas!=0 and area*(1+similarity)>areas and area*(1-similarity)<areas and area!=areas:
-            groups_area[counter]=(area+areas)/2
-            groups_area[]
-            print('Group nr', counter,'area', area)
-            counter +=1
+    if area!=0:
+
+        print('Group nr', counter,'area', area)
+        counter +=1
 
 
 #cv2.drawContours(img,unified,-1,(0,255,0),2)

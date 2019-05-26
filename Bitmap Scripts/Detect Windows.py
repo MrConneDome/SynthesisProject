@@ -89,8 +89,8 @@ for i in range(maximum):
             counter1 = 1        
             for group_area in groups_area:
                 if group_area >0:
-                    if counter3==12:
-                        print(group_area,'average area vs window:',group_area,c_area,'group number',counter1,groups_h[counter1],groups_w[counter1],'window number', counter3,h,w)
+
+
                     #if area is similar to the average of existing group
 #                    print('iterating group', counter1)
                     if c_area>group_area*(1-similarity) and c_area<group_area*(1+similarity):
@@ -137,13 +137,13 @@ cv2.imshow('Windows Detection',image)
 counter = 0
 
 for area in groups_area:
-    for areas in groups_area:  
+
         
-        if area!=0 and areas!=0 and area*(1+similarity)>areas and area*(1-similarity)<areas and area!=areas:
-            groups_area[counter]=(area+areas)/2
-            groups_area[]
-            print('Group nr', counter,'area', area)
-            counter +=1
+    if area!=0 :
+
+       
+        print('Group nr', counter,'area', area)
+        counter +=1
 
 
 #cv2.drawContours(img,unified,-1,(0,255,0),2)
