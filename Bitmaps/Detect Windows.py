@@ -1,8 +1,6 @@
-# -*- coding: utf-8 -*-
 """
-Created on Sun May 26 16:08:40 2019
-
-@author: konra
+@author: Konrad Jarocki
+#Finding the windows 
 """
 
 import cv2
@@ -13,7 +11,7 @@ def find_if_close(cnt1,cnt2):
     for i in range(row1):
         for j in range(row2):
             dist = np.linalg.norm(cnt1[i]-cnt2[j])
-            if abs(dist) < 14 :
+            if abs(dist) < 16 :
                 return True
             elif i==row1-1 and j==row2-1:
                 return False
@@ -35,7 +33,7 @@ def averagecounter(cont_areas, group_numbers, group_number):
             
    
     
-img = cv2.imread('06rm7.jpg')
+img = cv2.imread('07rm5.jpg')
 gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
 ret,thresh = cv2.threshold(gray,150,255,cv2.THRESH_BINARY) 
 contours,hier = cv2.findContours(thresh,1,2)
