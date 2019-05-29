@@ -13,12 +13,11 @@ def find_if_close(cnt1,cnt2):
         for j in range(row2):
             dist = np.linalg.norm(cnt1[i]-cnt2[j])
             #distance condition
-            if abs(dist) < 16 :
-                return True
-            
+            if abs(dist) < 8 :
+                return True            
             elif i==row1-1 and j==row2-1:
                 return False
-            
+          
 #Function to calculate average of value in the group            
 def averagecounter(cont_areas, group_numbers, group_number):
     counter = 0
@@ -35,9 +34,20 @@ def averagecounter(cont_areas, group_numbers, group_number):
     area = area/counter
     return area
             
-               
+#Function to assign highest value among specific group member as group representative:
+def maximumcounter(cont_areas, group_numbers, group_number):
+    counter = 0
+    counter2 = 0             
+    area = 0
+    for i in group_numbers:
+        if i==group_number:
+            if cont_areas[counter]>area:
+                area = cont_areas[counter]
+        counter+=1
+                
+    return area
 #Importing the image    
-img = cv2.imread('07rm5.jpg')
+img = cv2.imread('06rm7.jpg')
 
 #Changing the type of data to fit the requirements of OpenCV
 gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -173,7 +183,9 @@ for i in range(maximum):
 #Assessment
 cv2.imshow('Windows Detection',image)
 counter = 0
-for area in groups_area:        
+ 
+for area in groups_area:   
+
     if area!=0:
-        print('Group nr', counter,'area', area)
+        print('Group nr', counter,'area', area, 'ratio:', groups_h[counter+1]/groups_w[counter+1], 'h:', groups_h[counter+1], 'w:', groups_w[counter+1])
         counter +=1
