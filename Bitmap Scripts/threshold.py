@@ -20,7 +20,7 @@ def threshold(fn,th_value):
         
     return histogram
 test = 4
-i=500
+i=600
 for j in range(test):
     
     histogram = threshold('histogram_1m.txt',i+j*50)

@@ -13,7 +13,11 @@ def find_if_close(cnt1,cnt2):
         for j in range(row2):
             dist = np.linalg.norm(cnt1[i]-cnt2[j])
             #distance condition
-            if abs(dist) < 8 :
+            x1,y1,w1,h1 = cv2.boundingRect(cnt1) 
+            x2,y2,w2,h2 = cv2.boundingRect(cnt2) 
+            c_area1 = w1*h1
+            c_area2 = w2*h2
+            if abs(dist) < 16 and  c_area1<100000 and c_area2<100000:
                 return True            
             elif i==row1-1 and j==row2-1:
                 return False
@@ -47,7 +51,7 @@ def maximumcounter(cont_areas, group_numbers, group_number):
                 
     return area
 #Importing the image    
-img = cv2.imread('06rm7.jpg')
+img = cv2.imread('07rm5.jpg')
 
 #Changing the type of data to fit the requirements of OpenCV
 gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -88,8 +92,8 @@ height = 531
 lenght = 616
 area = 310939
 
-similarity = 0.4
-similarity_d = 0.5
+similarity = 0.6
+similarity_d = 0.8
 
 #Some parameters
 groups_area = [0 for x in range(16)]
@@ -113,7 +117,7 @@ for i in range(maximum):
         c_area = w*h
         
         #Condition for size and minimum height and width
-        if c_area<0.4*area and c_area>0.003*area and w>20 and h>20:
+        if c_area<0.4*area and c_area>0.002*area and w>20 and h>20:
             
             cont_areas[counter3] = c_area
             cont_h[counter3] = h
@@ -125,8 +129,8 @@ for i in range(maximum):
                    
                     #if area is similar to the group parameters (area, height, width)
                     if c_area>group_area*(1-similarity) and c_area<group_area*(1+similarity):
-                        if w>groups_w[counter1]*(1-similarity_d) and w<groups_w[counter1]*(1+similarity_d):
-                            if h>groups_h[counter1]*(1-similarity_d) and h<groups_h[counter1]*(1+similarity_d):
+                        if w>groups_w[counter1]*(1-similarity_d/2) and w<groups_w[counter1]*(1+similarity_d):
+                            if h>groups_h[counter1]*(1-similarity_d/2) and h<groups_h[counter1]*(1+similarity_d):
                                 
                                 print('Found similar group, average area vs window:',group_area,c_area,'group number',counter1,groups_h[counter1],groups_w[counter1],'window number', counter3,h,w)
                                 group_numbers[counter3] = counter1
@@ -141,9 +145,9 @@ for i in range(maximum):
                 print('Did not find similar group, window area, height, width:',c_area,h,w,' creating group number',counter2,'window number', counter3)
                 
             #calculate the parameters for the group after assignation
-            groups_area[int(group_numbers[counter3])] = averagecounter(cont_areas, group_numbers, group_numbers[counter3])
-            groups_w[int(group_numbers[counter3])] = averagecounter(cont_w, group_numbers, group_numbers[counter3])
-            groups_h[int(group_numbers[counter3])] = averagecounter(cont_h, group_numbers, group_numbers[counter3])
+            groups_area[int(group_numbers[counter3])] = maximumcounter(cont_areas, group_numbers, group_numbers[counter3])
+            groups_w[int(group_numbers[counter3])] = maximumcounter(cont_w, group_numbers, group_numbers[counter3])
+            groups_h[int(group_numbers[counter3])] = maximumcounter(cont_h, group_numbers, group_numbers[counter3])
             print('Group',group_numbers[counter3],'Updated area,height and width:', groups_area[int(group_numbers[counter3])],groups_h[int(group_numbers[counter3])],groups_w[int(group_numbers[counter3])])
             
             counter3+=1

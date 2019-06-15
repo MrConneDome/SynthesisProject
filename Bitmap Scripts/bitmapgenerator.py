@@ -28,14 +28,10 @@ def makeasc(filename, parameter):
     text_file.write(cellsize)
     text_file.write("nodata_value -9999\n")
     
-    #Opening the xls file
-    workbook = xlrd.open_workbook('C:/Users/konra/Documents/GitHub/Bitmap Example/bitmaptest.xls')
-    worksheet = workbook.sheet_by_name('Arkusz1')
-
     w=x_size
     h=y_size
-#    filt = filters.applygaussian('C:/Users/konra/Documents/GitHub/Bitmap Example/testraster.txt',1,120)
-#    print(filt)
+    filt = filters.applygaussian('C:/Users/konra/Documents/GitHub/Bitmap Example/testraster.txt',1,120)
+    print(filt)
     for i in range(w):
         for j in range(h):
             
